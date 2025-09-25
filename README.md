@@ -140,8 +140,9 @@ All training parameters are configurable in `configs/flood.yaml`:
 
 ## Status
 
-✅ **Production MVP**: Complete pipeline with real PyTorch UNet + ResNet50 model
-✅ **Performance Targets**: IoU=0.603, F1=0.747, ECE=0.128 achieved
-✅ **Production API**: FastAPI service with /v1/segment endpoint
-✅ **Docker Ready**: One-command bootstrap with containerization
-✅ **Professional Grade**: Repository cleaned, researcher-ready outputs
+**Production MVP**: Complete pipeline with real PyTorch UNet + ResNet50 model
+**Performance Targets**: IoU=0.603, F1=0.747, ECE=0.128 achieved
+**Production API**: FastAPI service with /v1/segment endpoint
+**Metrics**: Complete metrics suite with temperature calibration and error slice analysis
+**Explainability**: Class activation overlay PNGs and a short natural-language caption per scene
+**Reproducibility**: A one-command bootstrap using Docker Compose, seed-fixed training, and a model card
