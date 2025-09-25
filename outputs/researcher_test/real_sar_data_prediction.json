@@ -1,0 +1,20 @@
+{
+  "input_file": "data/tiles/test/real_sar_data.tif",
+  "probability_map": "outputs/researcher_test/real_sar_data_proba.png",
+  "binary_mask": "outputs/researcher_test/real_sar_data_mask.png",
+  "prediction": {
+    "flood_pixels": 6539,
+    "total_pixels": 262144,
+    "flood_percentage": 2.4944305419921875,
+    "confidence": 0.9996512532234192,
+    "max_probability": 1.0,
+    "min_probability": 0.0,
+    "threshold_used": 0.35
+  },
+  "model_info": {
+    "architecture": "UNet + resnet50",
+    "epoch": 25,
+    "parameters": 47440065
+  },
+  "processed_at": "2025-09-25 11:15:42"
+}

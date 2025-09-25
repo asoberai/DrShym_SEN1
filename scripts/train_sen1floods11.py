@@ -32,7 +32,7 @@ project_root = Path(__file__).parent.parent
 sys.path.append(str(project_root))
 
 from models.unet import UNet
-from eval.metrics import FloodMetrics
+from eval.metrics import compute_metrics
 from utils.seed import set_deterministic_seed
 
 
@@ -50,8 +50,8 @@ class SEN1FloodsDataset(Dataset):
         # Filter for existing files
         valid_data = []
         for _, row in self.data.iterrows():
-            s1_path = self.data_root / 'catalog' / 'sen1floods11_hand_labeled_source' / row['s1_file']
-            label_path = self.data_root / 'catalog' / 'sen1floods11_hand_labeled_label' / row['label_file']
+            s1_path = self.data_root / 'data' / 'flood_events' / 'HandLabeled' / 'S1Hand' / row['s1_file']
+            label_path = self.data_root / 'data' / 'flood_events' / 'HandLabeled' / 'LabelHand' / row['label_file']
 
             if s1_path.exists() and label_path.exists():
                 valid_data.append(row)
@@ -68,12 +68,12 @@ class SEN1FloodsDataset(Dataset):
         row = self.data.iloc[idx]
 
         # Load SAR image
-        s1_path = self.data_root / 'catalog' / 'sen1floods11_hand_labeled_source' / row['s1_file']
+        s1_path = self.data_root / 'data' / 'flood_events' / 'HandLabeled' / 'S1Hand' / row['s1_file']
         with rasterio.open(s1_path) as src:
             sar = src.read(1).astype(np.float32)
 
         # Load label
-        label_path = self.data_root / 'catalog' / 'sen1floods11_hand_labeled_label' / row['label_file']
+        label_path = self.data_root / 'data' / 'flood_events' / 'HandLabeled' / 'LabelHand' / row['label_file']
         with rasterio.open(label_path) as src:
             label = src.read(1).astype(np.float32)
 
@@ -220,8 +220,7 @@ def train_model(config: Dict[str, Any]):
         optimizer, T_max=config['training']['epochs']
     )
 
-    # Setup metrics
-    metrics = FloodMetrics()
+    # Setup metrics tracking
 
     # Training loop
     best_val_f1 = 0
@@ -253,7 +252,7 @@ def train_model(config: Dict[str, Any]):
             # Calculate metrics
             with torch.no_grad():
                 pred = torch.sigmoid(output) > 0.5
-                batch_metrics = metrics.compute_metrics(pred.cpu(), target.cpu())
+                batch_metrics = compute_metrics(pred.cpu(), target.cpu())
                 for key in train_metrics:
                     train_metrics[key] += batch_metrics[key]
 
@@ -276,7 +275,7 @@ def train_model(config: Dict[str, Any]):
 
                 # Calculate metrics
                 pred = torch.sigmoid(output) > 0.5
-                batch_metrics = metrics.compute_metrics(pred.cpu(), target.cpu())
+                batch_metrics = compute_metrics(pred.cpu(), target.cpu())
                 for key in val_metrics:
                     val_metrics[key] += batch_metrics[key]
 

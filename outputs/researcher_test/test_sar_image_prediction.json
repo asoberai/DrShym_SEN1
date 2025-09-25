@@ -1,0 +1,20 @@
+{
+  "input_file": "data/tiles/test/test_sar_image.tif",
+  "probability_map": "outputs/researcher_test/test_sar_image_proba.png",
+  "binary_mask": "outputs/researcher_test/test_sar_image_mask.png",
+  "prediction": {
+    "flood_pixels": 6547,
+    "total_pixels": 262144,
+    "flood_percentage": 2.4974822998046875,
+    "confidence": 0.9998331069946289,
+    "max_probability": 1.0,
+    "min_probability": 0.0,
+    "threshold_used": 0.35
+  },
+  "model_info": {
+    "architecture": "UNet + resnet50",
+    "epoch": 25,
+    "parameters": 47440065
+  },
+  "processed_at": "2025-09-25 11:15:42"
+}
