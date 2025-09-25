@@ -1,0 +1,45 @@
+FROM python:3.11-slim
+
+# Production environment settings
+ENV PYTHONHASHSEED=0
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+
+# Install system dependencies including GDAL
+RUN apt-get update && apt-get install -y \
+    curl \
+    gdal-bin \
+    libgdal-dev \
+    libproj-dev \
+    libgeos-dev \
+    build-essential \
+    pkg-config \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set GDAL environment variables
+ENV GDAL_CONFIG=/usr/bin/gdal-config
+ENV CPLUS_INCLUDE_PATH=/usr/include/gdal
+ENV C_INCLUDE_PATH=/usr/include/gdal
+
+# Create app directory
+WORKDIR /app
+
+# Copy production requirements
+COPY requirements.prod.txt .
+RUN pip install --no-cache-dir -r requirements.prod.txt
+
+# Copy simple API server and required files
+COPY simple_api_server.py /app/
+COPY models /app/models/
+COPY utils /app/utils/
+COPY eval /app/eval/
+COPY artifacts /app/artifacts/
+
+# Create output directory
+RUN mkdir -p /outputs
+
+# Expose port
+EXPOSE 8080
+
+# Run simple API server
+CMD ["python", "simple_api_server.py"]

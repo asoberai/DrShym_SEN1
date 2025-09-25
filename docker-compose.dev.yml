@@ -1,0 +1,16 @@
+services:
+  drshym_api:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.cpu
+    ports:
+      - "8080:8080"
+    volumes:
+      # Data structure per spec: /data/scenes/ for input SAR imagery
+      - ./data:/data
+      - ./outputs:/outputs
+      # Optional: Mount artifacts for model checkpoints
+      - ./artifacts:/artifacts:ro
+    environment:
+      - PYTHONHASHSEED=0
+    restart: unless-stopped

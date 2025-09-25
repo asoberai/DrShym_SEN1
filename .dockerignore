@@ -1,0 +1,25 @@
+# Production build - include required files for testing
+
+# Exclude unnecessary files first
+__pycache__/
+*.pyc
+*.pyo
+.git/
+.gitignore
+outputs/
+data/
+*.png
+test_*
+*.md
+
+# Include required directories and files
+!serve/
+!models/
+!utils/
+!eval/
+!artifacts/
+!simple_api_server.py
+!requirements.prod.txt
+!requirements.txt
+!docker/Dockerfile.prod
+!docker/Dockerfile.cpu

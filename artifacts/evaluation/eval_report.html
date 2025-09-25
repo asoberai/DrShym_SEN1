@@ -1,0 +1,99 @@
+
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>DrShym Climate - Model Report</title>
+                <style>
+                    body { font-family: Arial, sans-serif; margin: 40px; }
+                    .container { max-width: 800px; margin: 0 auto; }
+                    h1, h2 { color: #2c3e50; }
+                    .metric { background: #ecf0f1; padding: 15px; margin: 10px 0; border-radius: 5px; }
+                    pre { background: #f8f8f8; padding: 15px; border-radius: 5px; }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <h1>🌊 DrShym Climate Flood Segmentation Model</h1>
+                    <h2>Model Information Report</h2>
+                    <p>Generated on 2025-09-24 14:40:18</p>
+
+                    <div class="metric">
+                        <h3>Model Architecture</h3>
+                        <p>UNet + resnet50</p>
+                    </div>
+
+                    <div class="metric">
+                        <h3>Training Results</h3>
+                        <p>Epoch: 7</p>
+                        <p>Best F1: 0.5307</p>
+                    </div>
+
+                    <h3>Configuration</h3>
+                    <pre>augmentation:
+  brightness_contrast: 0.4
+  elastic_transform: 0.2
+  enabled: true
+  gaussian_noise: 0.3
+  grid_distortion: 0.2
+  horizontal_flip: 0.5
+  rotation_90: 0.7
+  vertical_flip: 0.5
+calibration:
+  method: temperature
+  val_split: 0.2
+data:
+  normalize: zscore
+  overlap: 64
+  polarization: VV
+  sampler:
+    test_tiles: 400
+    train_tiles: 5000
+    val_tiles: 800
+  tile: 512
+eval:
+  early_stopping:
+    min_delta: 0.001
+    monitor: val_f1
+    patience: 5
+  metrics:
+  - iou
+  - f1
+  - precision
+  - recall
+  - brier
+  - ece
+  slices:
+  - backscatter_intensity_quantiles
+  - slope_bins
+  - landcover_class
+model:
+  batch_size: 6
+  dropout: 0.2
+  encoder: resnet50
+  epochs: 15
+  loss: focal_dice_bce
+  lr: 0.0002
+  scheduler: cosine_annealing
+  segmenter: unet
+  weight_decay: 1.0e-05
+policy:
+  export_geojson: true
+  keep_crs: true
+seed: 42
+serve:
+  max_tile_batch: 16
+  threshold: 0.35
+training:
+  class_weights:
+  - 1.0
+  - 3.0
+  gradient_accumulation: 2
+  label_smoothing: 0.05
+  mixed_precision: true
+</pre>
+
+                    <p><em>🤖 Generated with DrShym Climate MVP</em></p>
+                </div>
+            </body>
+            </html>
+            

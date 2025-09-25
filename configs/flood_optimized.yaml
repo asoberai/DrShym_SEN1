@@ -1,0 +1,63 @@
+seed: 42
+
+data:
+  tile: 512  # Increased resolution for better detail capture
+  overlap: 64  # Better overlap for continuity
+  polarization: "VV"
+  normalize: "zscore"
+  sampler:
+    train_tiles: 5000  # Use more training data
+    val_tiles: 800     # More validation samples
+    test_tiles: 400
+
+model:
+  encoder: "resnet50"  # Better feature extraction
+  segmenter: "unet"
+  loss: "focal_dice_bce"  # Focal loss to handle class imbalance
+  lr: 0.0002  # Slightly higher for faster convergence
+  epochs: 15  # Much longer training
+  batch_size: 6  # Reduced for 512px tiles
+  scheduler: "cosine_annealing"  # Better learning rate schedule
+  weight_decay: 0.00001
+  dropout: 0.2  # Regularization
+
+augmentation:
+  # Advanced augmentation for better generalization
+  enabled: true
+  horizontal_flip: 0.5
+  vertical_flip: 0.5
+  rotation_90: 0.7  # More aggressive rotation
+  gaussian_noise: 0.3
+  brightness_contrast: 0.4
+  elastic_transform: 0.2  # New: elastic deformation
+  grid_distortion: 0.2    # New: grid distortion
+
+eval:
+  metrics: ["iou", "f1", "precision", "recall", "brier", "ece"]
+  slices:
+    - "backscatter_intensity_quantiles"
+    - "slope_bins"
+    - "landcover_class"
+  early_stopping:
+    patience: 5
+    min_delta: 0.001
+    monitor: "val_f1"
+
+calibration:
+  method: "temperature"
+  val_split: 0.2
+
+serve:
+  threshold: 0.35  # Lower threshold to improve precision
+  max_tile_batch: 16  # Reduced for larger tiles
+
+policy:
+  export_geojson: true
+  keep_crs: true
+
+# New: Advanced training strategies
+training:
+  mixed_precision: true  # Faster training
+  gradient_accumulation: 2  # Simulate larger batch sizes
+  label_smoothing: 0.05  # Reduce overconfidence
+  class_weights: [1.0, 3.0]  # Weight flood class higher

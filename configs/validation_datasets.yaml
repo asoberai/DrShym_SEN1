@@ -1,0 +1,236 @@
+# Flexible validation dataset configuration for DrShym Climate MVP
+# Allows easy modification of test scenarios and datasets
+
+validation_config:
+  version: "1.0"
+  description: "Configurable validation datasets for flood detection testing"
+  
+  # Default validation parameters
+  defaults:
+    tile_size: 512
+    overlap: 64
+    threshold: 0.45
+    confidence_min: 0.65
+    processing_timeout: 10.0
+
+  # Production metrics targets
+  targets:
+    iou_min: 0.55
+    f1_min: 0.70
+    ece_max: 0.15
+    precision_min: 0.60
+    recall_min: 0.60
+
+# Validation dataset definitions
+datasets:
+  
+  # Core validation set - always tested
+  core_validation:
+    description: "Essential flood vs permanent water scenarios"
+    required: true
+    scenes:
+      - name: "Mekong_922373_S1Hand.tif"
+        type: "river_flood"
+        region: "Southeast_Asia"
+        expected_flood_range: [15.0, 40.0]  # Expected flood percentage range
+        confidence_target: 0.75
+        description: "Major river flood event in Mekong Delta"
+        
+      - name: "Sri-Lanka_249079_S1Hand.tif"
+        type: "coastal_flood"
+        region: "South_Asia"
+        expected_flood_range: [10.0, 35.0]
+        confidence_target: 0.70
+        description: "Coastal flooding in Sri Lanka"
+        
+      - name: "sentinel_1_1_high_density_29.21731432328078_-1.6766755053082918.tif"
+        type: "permanent_water_high"
+        region: "Africa"
+        expected_flood_range: [8.0, 18.0]
+        confidence_target: 0.72
+        description: "High density permanent water features"
+
+  # Extended validation set - optional comprehensive testing
+  extended_validation:
+    description: "Comprehensive geographic and scenario coverage"
+    required: false
+    scenes:
+      - name: "Paraguay_12870_S1Hand.tif"
+        type: "river_flood"
+        region: "South_America"
+        expected_flood_range: [12.0, 38.0]
+        confidence_target: 0.75
+        description: "Paraguay river system flooding"
+        
+      - name: "Somalia_685158_S1Hand.tif"
+        type: "arid_flood"
+        region: "Africa"
+        expected_flood_range: [5.0, 25.0]
+        confidence_target: 0.70
+        description: "Flash flooding in arid region"
+        
+      - name: "sentinel_1_1_low_density_29.0793185229798_-1.676827114744109.tif"
+        type: "permanent_water_low"
+        region: "Africa"
+        expected_flood_range: [2.0, 8.0]
+        confidence_target: 0.68
+        description: "Low density permanent water"
+        
+      - name: "sentinel_1_23_rural_3.7354380025832_6.621573323021831.tif"
+        type: "rural_water"
+        region: "Africa"
+        expected_flood_range: [3.0, 10.0]
+        confidence_target: 0.70
+        description: "Rural water features"
+        
+      - name: "sentinel_1_1_inhabited_28.94160364604518_-1.9547405879001232.tif"
+        type: "urban_water"
+        region: "Africa"
+        expected_flood_range: [4.0, 12.0]
+        confidence_target: 0.72
+        description: "Urban area with water features"
+
+  # Stress test scenarios - challenging edge cases
+  stress_test:
+    description: "Challenging scenarios for robustness testing"
+    required: false
+    scenes:
+      - name: "sentinel_1_236_high_density_118.73601535813772_24.72477447103512.tif"
+        type: "high_latitude"
+        region: "Asia"
+        expected_flood_range: [5.0, 15.0]
+        confidence_target: 0.65
+        description: "High latitude permanent water"
+        
+      - name: "sentinel_1_4_inhabited_44.34339219385988_-12.189131093636444.tif"
+        type: "small_waterbodies"
+        region: "Africa"
+        expected_flood_range: [1.0, 6.0]
+        confidence_target: 0.60
+        description: "Small scattered water bodies"
+
+# Test scenarios and options
+test_scenarios:
+  
+  # Quick validation - for rapid testing
+  quick:
+    description: "Fast validation for development"
+    datasets: ["core_validation"]
+    options:
+      tile: 256
+      overlap: 32
+      explain: false
+    
+  # Standard validation - for regular testing  
+  standard:
+    description: "Standard production validation"
+    datasets: ["core_validation", "extended_validation"]
+    options:
+      tile: 512
+      overlap: 64
+      explain: true
+      
+  # Comprehensive validation - for release testing
+  comprehensive:
+    description: "Full validation including stress tests"
+    datasets: ["core_validation", "extended_validation", "stress_test"]
+    options:
+      tile: 512
+      overlap: 64
+      explain: true
+      
+  # Performance validation - for speed testing
+  performance:
+    description: "Performance and speed validation"
+    datasets: ["core_validation"]
+    options:
+      tile: 1024
+      overlap: 128
+      explain: false
+    timing_focus: true
+
+# Validation reporting configuration
+reporting:
+  output_formats: ["json", "html", "console"]
+  
+  # What to include in reports
+  include:
+    - scene_results
+    - performance_metrics
+    - target_compliance
+    - geographic_coverage
+    - error_analysis
+    
+  # Report thresholds for warnings/errors
+  thresholds:
+    warning_confidence: 0.60  # Warn if confidence below this
+    error_flood_range: 2.0    # Error if flood % outside range by this factor
+    
+# API testing configuration
+api_testing:
+  base_url: "http://localhost:8080"
+  endpoints:
+    health: "/health"
+    segment: "/v1/segment"
+  
+  # Request configuration
+  request_config:
+    timeout: 30.0
+    retry_count: 3
+    retry_delay: 1.0
+    
+  # Response validation
+  response_validation:
+    required_fields:
+      - "scene_id"
+      - "outputs"
+      - "caption"
+      - "provenance"
+      - "policy"
+    
+    required_outputs:
+      - "mask_uri"
+      - "proba_uri"
+      - "overlay_png"
+
+# Custom test scenarios for specific use cases
+custom_scenarios:
+  
+  # Test specific domain types
+  domain_testing:
+    flood_sar:
+      scenes: ["Mekong_922373_S1Hand.tif", "Sri-Lanka_249079_S1Hand.tif"]
+      domain: "flood_sar"
+    
+    permanent_water:
+      scenes: ["sentinel_1_1_high_density_29.21731432328078_-1.6766755053082918.tif"]
+      domain: "permanent_water"
+  
+  # Test different tile configurations
+  tile_size_testing:
+    small_tiles:
+      tile_size: 256
+      overlap: 32
+      scenes: ["Mekong_922373_S1Hand.tif"]
+      
+    large_tiles:
+      tile_size: 1024
+      overlap: 128
+      scenes: ["Mekong_922373_S1Hand.tif"]
+
+# Environment-specific configurations
+environments:
+  
+  development:
+    datasets: ["core_validation"]
+    quick_mode: true
+    verbose: true
+    
+  staging:
+    datasets: ["core_validation", "extended_validation"]
+    performance_testing: true
+    
+  production:
+    datasets: ["core_validation", "extended_validation", "stress_test"]
+    strict_targets: true
+    comprehensive_reporting: true

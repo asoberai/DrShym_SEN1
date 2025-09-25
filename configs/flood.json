@@ -1,0 +1,17 @@
+{
+  "seed": 42,
+  "data": {
+    "tile": 256,
+    "overlap": 64,
+    "polarization": "VV",
+    "normalize": "zscore"
+  },
+  "model": {
+    "encoder": "resnet18",
+    "segmenter": "unet",
+    "loss": "dice_bce",
+    "lr": 0.001,
+    "epochs": 3,
+    "batch_size": 4
+  }
+}

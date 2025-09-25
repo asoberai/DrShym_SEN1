@@ -1,0 +1,38 @@
+seed: 42
+
+data:
+  tile: 256
+  overlap: 32
+  polarization: "VV"
+  normalize: "zscore"
+  sampler:
+    train_tiles: 3000
+    val_tiles: 400
+    test_tiles: 400
+
+model:
+  encoder: "resnet18"  # small and fast
+  segmenter: "unet"
+  loss: "dice_bce"
+  lr: 1e-3
+  epochs: 3
+  batch_size: 8
+
+eval:
+  metrics: ["iou", "f1", "precision", "recall", "brier", "ece"]
+  slices:
+    - "backscatter_intensity_quantiles"
+    - "slope_bins"
+    - "landcover_class"
+
+calibration:
+  method: "temperature"
+  val_split: 0.2
+
+serve:
+  threshold: 0.45
+  max_tile_batch: 32
+
+policy:
+  export_geojson: true
+  keep_crs: true

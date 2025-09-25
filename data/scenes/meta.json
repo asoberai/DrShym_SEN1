@@ -1,0 +1,24 @@
+{
+  "scenes": [
+    {
+      "scene_id": "test_scene_1",
+      "original_size": [
+        1024,
+        1024
+      ],
+      "tile_size": 512,
+      "overlap": 64,
+      "crs": "EPSG:4326",
+      "bounds": [
+        10.0,
+        50.0,
+        12.0,
+        52.0
+      ],
+      "tiles": [
+        "test_tile_1.tif",
+        "test_tile_2.tif"
+      ]
+    }
+  ]
+}

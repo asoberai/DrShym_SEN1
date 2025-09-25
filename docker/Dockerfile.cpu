@@ -1,0 +1,64 @@
+FROM ubuntu:22.04
+
+# Set environment for deterministic execution
+ENV PYTHONHASHSEED=0
+ENV PYTHONUNBUFFERED=1
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    python3.11 \
+    python3.11-dev \
+    python3.11-venv \
+    python3-pip \
+    gdal-bin \
+    libgdal-dev \
+    libproj-dev \
+    libgeos-dev \
+    libspatialindex-dev \
+    build-essential \
+    curl \
+    pkg-config \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create symlinks for python (remove existing first)
+RUN rm -f /usr/bin/python /usr/bin/python3 && \
+    ln -s /usr/bin/python3.11 /usr/bin/python && \
+    ln -s /usr/bin/python3.11 /usr/bin/python3
+
+# Set GDAL environment variables to match system GDAL
+ENV GDAL_CONFIG=/usr/bin/gdal-config
+ENV CPLUS_INCLUDE_PATH=/usr/include/gdal
+ENV C_INCLUDE_PATH=/usr/include/gdal
+ENV GDAL_VERSION=3.4.1
+
+# Set Python path for proper module imports
+ENV PYTHONPATH=/app
+
+# Set working directory
+WORKDIR /app
+
+# Copy requirements first for better caching
+COPY requirements.txt .
+
+# Upgrade pip first
+RUN python -m pip install --upgrade pip
+
+# Install Python dependencies with system GDAL
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Install rasterio and fiona separately to use system GDAL
+RUN pip install --no-cache-dir --no-binary rasterio,fiona \
+    rasterio==1.3.9 fiona==1.9.5 geopandas==0.14.4
+
+# Copy application code
+COPY . .
+
+# Create directories for data and outputs
+RUN mkdir -p /data/scenes /outputs
+
+# Expose FastAPI port
+EXPOSE 8080
+
+# Set default command - use python module syntax for proper imports
+CMD ["python", "-m", "uvicorn", "drshym_climate.serve.api:app", "--host", "0.0.0.0", "--port", "8080"]
