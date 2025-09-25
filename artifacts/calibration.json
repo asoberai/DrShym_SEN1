@@ -1,0 +1,6 @@
+{
+  "temperature": 1.2,
+  "ece_before": 0.173,
+  "ece_after": 0.096,
+  "method": "temperature_scaling"
+}

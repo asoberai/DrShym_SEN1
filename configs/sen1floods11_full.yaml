@@ -1,0 +1,68 @@
+seed: 42
+
+# SEN1Floods11 dataset configuration for full training
+dataset:
+  name: "sen1floods11"
+  root_dir: "/Users/aoberai/Documents/SARFlood/SEN_DATA/v1.1"
+  splits:
+    train: "splits/flood_handlabeled/flood_train_data.csv"
+    val: "splits/flood_handlabeled/flood_valid_data.csv"
+    test: "splits/flood_handlabeled/flood_test_data.csv"
+  include_perm_water: true
+  perm_water_splits: "splits/perm_water"
+
+data:
+  tile_size: 512
+  overlap: 64
+  polarization: "VV"
+  normalize: "minmax"  # 0-1 normalization for SAR
+  augmentations:
+    flip_horizontal: 0.5
+    flip_vertical: 0.5
+    rotate_90: 0.5
+    gaussian_noise: 0.1
+
+model:
+  encoder: "resnet50"  # Full model for production
+  segmenter: "unet"
+  pretrained: true
+  in_channels: 1
+  num_classes: 1
+
+training:
+  loss: "focal_dice_bce"  # Better for imbalanced data
+  lr: 1e-4
+  epochs: 50
+  batch_size: 16
+  patience: 10
+  scheduler: "cosine"
+  weight_decay: 1e-5
+  gradient_clipping: 1.0
+
+eval:
+  metrics: ["iou", "f1", "precision", "recall", "accuracy", "brier", "ece"]
+  slices:
+    - "backscatter_intensity_quantiles"
+    - "terrain_slope_bins"
+    - "landcover_class"
+    - "flood_severity_levels"
+
+calibration:
+  method: "temperature"
+  val_fraction: 0.2
+
+output:
+  checkpoint_dir: "artifacts/checkpoints"
+  save_best: true
+  save_last: true
+  log_dir: "artifacts/logs"
+
+serve:
+  threshold: 0.45
+  max_tile_batch: 32
+  temperature_scaling: true
+
+policy:
+  export_geojson: true
+  keep_crs: true
+  track_provenance: true

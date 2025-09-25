@@ -1,0 +1,20 @@
+{
+  "input_file": "data/tiles/test/Ghana_124834_S1Hand.tif",
+  "probability_map": "outputs/test_predictions/Ghana_124834_S1Hand_proba.png",
+  "binary_mask": "outputs/test_predictions/Ghana_124834_S1Hand_mask.png",
+  "prediction": {
+    "flood_pixels": 6528,
+    "total_pixels": 262144,
+    "flood_percentage": 2.490234375,
+    "confidence": 0.9998119473457336,
+    "max_probability": 1.0,
+    "min_probability": 0.0,
+    "threshold_used": 0.35
+  },
+  "model_info": {
+    "architecture": "UNet + resnet50",
+    "epoch": 25,
+    "parameters": 47440065
+  },
+  "processed_at": "2025-09-25 10:52:26"
+}
